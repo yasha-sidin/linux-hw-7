@@ -1,0 +1,26 @@
+ЗАДАНИЕ 1
+
+  apt install nginx php8.1 php8.1-fpm
+
+  vim /etc/nginx/sites-enabled/default
+
+  Добавляем конфигурацию:        
+    location ~ \.php$ {
+      include snippets/fastcgi-php.conf;
+      root /var/www/html;
+      # With php-fpm (or other unix sockets):
+      fastcgi_pass unix:/run/php/php8.1-fpm.sock;
+      # With php-cgi (or other tcp sockets):
+      # fastcgi_pass 127.0.0.1:9000;
+    }
+
+  Проверяем подключение:
+    cat > /var/www/html << EOF
+  >   <?php
+  >   phpinfo();
+  >   ?>
+  >   EOF  
+
+    Делаем запрос на сервер в браузере локального ПК: 
+      http://192.168.227.131/info.php
+
