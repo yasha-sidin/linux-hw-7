@@ -24,3 +24,27 @@
     Делаем запрос на сервер в браузере локального ПК: 
       http://192.168.227.131/info.php
 
+ЗАДАНИЕ 2
+
+  vim /etc/nginx/sites-enabled/default
+  Комментируем строчку, используемую для связи с PHP-FPM:
+#       location ~ \.php$ {
+#               include snippets/fastcgi-php.conf;
+#               root /var/www/html;
+#               # With php-fpm (or other unix sockets):
+#               fastcgi_pass unix:/run/php/php8.1-fpm.sock;
+#               # With php-cgi (or other tcp sockets):
+#               # fastcgi_pass 127.0.0.1:9000;
+#       }
+
+  Добавляем строчку в конфигурацию:
+
+location / {
+  # First attempt to serve request as file, then
+  # as directory, then fall back to displaying a 404.
+
+  proxy_pass http://localhost:8080;
+  proxy_set_header Host $host;
+  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  proxy_set_header X-Real-IP $remote_addr;
+}
