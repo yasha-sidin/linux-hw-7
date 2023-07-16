@@ -1,33 +1,52 @@
+Все команды от пользователя root
+
 ЗАДАНИЕ 1
 
-  apt install nginx php8.1 php8.1-fpm
+    apt install nginx php8.1 php8.1-fpm
 
-  vim /etc/nginx/sites-enabled/default
+    vim /etc/nginx/sites-enabled/default
 
-  Добавляем конфигурацию:        
+    Добавляем конфигурацию:        
     location ~ \.php$ {
-      include snippets/fastcgi-php.conf;
-      root /var/www/html;
-      # With php-fpm (or other unix sockets):
-      fastcgi_pass unix:/run/php/php8.1-fpm.sock;
-      # With php-cgi (or other tcp sockets):
-      # fastcgi_pass 127.0.0.1:9000;
+        include snippets/fastcgi-php.conf;
+        root /var/www/html;
+        # With php-fpm (or other unix sockets):
+        fastcgi_pass unix:/run/php/php8.1-fpm.sock;
+        # With php-cgi (or other tcp sockets):
+        # fastcgi_pass 127.0.0.1:9000;
     }
 
-  Проверяем подключение:
+    nginx -t
+
+    systemctl reload nginx
+
+    Проверяем подключение:
     cat > /var/www/html << EOF
   >   <?php
   >   phpinfo();
   >   ?>
   >   EOF  
 
-    Делаем запрос на сервер в браузере локального ПК: 
-      http://192.168.227.131/info.php
+    Делаем запрос на сервер в браузере локального ПК(Проверяем): 
+        http://192.168.227.131/info.php
 
-ЗАДАНИЕ 2
+ЗАДАНИЕ 2 и 3
 
-  vim /etc/nginx/sites-enabled/default
-  Комментируем строчку, используемую для связи с PHP-FPM:
+    apt install apache2  
+
+    vim /etc/apache2/ports.conf
+    Меняем в начале файла: Listen 80 > Listen 8080
+
+    apachectl -t
+
+    systemctl reload apache2
+
+    Делаем запрос на сервер в браузере локального ПК(Проверяем): 
+        http://192.168.227.131/info.php
+
+    vim /etc/nginx/sites-enabled/default
+    Комментируем строчку, используемую для связи с PHP-FPM:
+
 #       location ~ \.php$ {
 #               include snippets/fastcgi-php.conf;
 #               root /var/www/html;
@@ -37,14 +56,53 @@
 #               # fastcgi_pass 127.0.0.1:9000;
 #       }
 
-  Добавляем строчку в конфигурацию:
+    Добавляем строчку в конфигурацию:
 
-location / {
-  # First attempt to serve request as file, then
-  # as directory, then fall back to displaying a 404.
+    location / {
+        # First attempt to serve request as file, then
+        # as directory, then fall back to displaying a 404.
 
-  proxy_pass http://localhost:8080;
-  proxy_set_header Host $host;
-  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-  proxy_set_header X-Real-IP $remote_addr;
-}
+        proxy_pass http://localhost:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+Делаем запрос на сервер в браузере локального ПК(Проверяем): 
+    http://192.168.227.131/info.php
+
+ЗАДАНИЕ 4
+
+    apt install mysql-server-8.0
+
+    mysql
+
+    use mysql;
+
+    CREATE DATABASE socialsite;
+
+    USE socialsite;
+
+    CREATE TABLE users (id SERIAL, name VARCHAR(50), lastname VARCHAR(50));
+
+    INSERT users (name, lastname) VALUES ('Kate', 'Petrova'), ('Ivan', 'Ivanov');
+    
+    SELECT * FROM users;
+
+ЗАДАНИЕ 5
+
+    apt install phpmyadmin
+
+    ln -s /usr/share/phpmyadmin /var/www/html/phpmyadmin
+
+    mysql
+
+    use mysql;
+
+    CREATE USER 'test_user'@'localhost' IDENTIFIED BY 'password';
+
+    Делаем запрос на сервер в браузере локального ПК(Проверяем): 
+        http://192.168.227.131/phpmyadmin
+    
+    Вводим данные пользователя, которого создали в mysql
+
